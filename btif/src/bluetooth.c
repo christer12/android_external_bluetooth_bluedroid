@@ -724,6 +724,26 @@ static bt_status_t bt_le_lpp_read_rssi_threshold(const bt_bdaddr_t *remote_bda)
     bdcpy(btif_cb.remote_bda.address, remote_bda->address);
     return btif_transfer_context(bt_le_handle_lpp_monitor_rssi, BT_LE_LPP_READ_RSSI_THRESH,
                                  (char*)&btif_cb, sizeof(bt_le_lpp_monitor_rssi_cb_t), NULL);
+int vendor_specific_command(uint16_t opcode, uint8_t* buf, uint8_t len)
+{
+    ALOGI("vendor_specific_command");
+
+    /* sanity check */
+    if (interface_ready() == FALSE)
+        return BT_STATUS_NOT_READY;
+
+    return btif_vendor_specific_command(opcode, buf, len);
+}
+
+int enable_vendor_specific_events(uint8_t enable)
+{
+    ALOGI("enable_vendor_specific_callbacks");
+
+    /* sanity check */
+    if (interface_ready() == FALSE)
+        return BT_STATUS_NOT_READY;
+
+    return btif_enable_vendor_specific_events(enable);
 }
 
 static const bt_interface_t bluetoothInterface = {
@@ -769,6 +789,8 @@ static const bt_interface_t bluetoothInterface = {
     bt_le_lpp_write_rssi_threshold,
     bt_le_lpp_enable_rssi_monitor,
     bt_le_lpp_read_rssi_threshold,
+    vendor_specific_command,
+    enable_vendor_specific_events,
 };
 
 const bt_interface_t* bluetooth__get_bluetooth_interface ()
